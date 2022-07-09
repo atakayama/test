@@ -1,0 +1,29 @@
+name: E2E Test Runner
+
+on: [pull_request]
+
+jobs:
+  # ファイルの変更確認
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      # クライアントコードの変更有無
+      client: ${{steps.filter.outputs.html5 == 'true'}}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            html5:
+              - 'src/**/*.html'
+
+  exec:
+    needs: changes
+    if: ${{needs.changes.outputs.client == 'true'}}
+    runs-on: ubuntu-latest
+    steps:
+      - name: echo
+        shell: bash
+        run: |
+          echo exec RUN
